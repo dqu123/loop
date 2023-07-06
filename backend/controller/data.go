@@ -23,7 +23,8 @@ type PlayerData struct {
 func NewGameData() GameData {
 	gameHash := uuid.NewString()[:constants.GameHashLength]
 	return GameData{
-		GameHash: gameHash,
+		GameHash:  gameHash,
+		PlayerMap: map[string]PlayerData{},
 	}
 }
 

@@ -22,15 +22,18 @@ func handleGames(w http.ResponseWriter, r *http.Request) {
 }
 
 type PostGameResponse struct {
-	URL string
+	URL      string `json:"url"`
+	GameHash string `json:"gameHash"`
 }
 
 func postGame(w http.ResponseWriter, r *http.Request) {
 	game := NewGameData()
-	dataGamesMap[game.GameHash] = game
+	gameHash := game.GameHash
+	dataGamesMap[gameHash] = game
 
 	resBytes, err := json.Marshal(PostGameResponse{
-		URL: fmt.Sprintf("%s/games/%s", constants.GetHost(), game.GameHash),
+		URL:      fmt.Sprintf("%s/games/%s", constants.GetHost(), gameHash),
+		GameHash: gameHash,
 	})
 	if err != nil {
 		w.WriteHeader(http.StatusInternalServerError)

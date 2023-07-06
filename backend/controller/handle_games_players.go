@@ -28,13 +28,14 @@ func handleGamesPlayers(w http.ResponseWriter, r *http.Request) {
 }
 
 type PostPlayerRequest struct {
-	GameHash   string
-	PlayerUUID string
+	GameHash   string `json:"gameHash"`
+	PlayerUUID string `json:"playerUuid"`
 }
 
 func postPlayer(w http.ResponseWriter, r *http.Request) (int, string, error) {
-	bodyBytes := []byte{}
-	_, err := r.Body.Read(bodyBytes)
+	decoder := json.NewDecoder(r.Body)
+	var req PostPlayerRequest
+	err := decoder.Decode(&req)
 	switch err {
 	case nil:
 		break
@@ -44,16 +45,12 @@ func postPlayer(w http.ResponseWriter, r *http.Request) (int, string, error) {
 		return http.StatusInternalServerError, "", err
 	}
 
-	var req PostPlayerRequest
-	err = json.Unmarshal(bodyBytes, &req)
-	if err != nil {
-		return http.StatusInternalServerError, "", err
-	}
-
 	game, ok := dataGamesMap[req.GameHash]
 	if !ok {
 		return http.StatusInternalServerError, "", fmt.Errorf("gameHash:%s not found", req.GameHash)
 	}
 	game.PlayerMap[req.PlayerUUID] = NewPlayerData()
+
+	logger.LogInfo(fmt.Sprintf("DATA GAMES MAP: %#v", dataGamesMap))
 	return http.StatusOK, "", nil
 }
